@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
@@ -59,11 +59,13 @@ class PricingAdmin(admin.ModelAdmin):
     )
     actions = None
 
+
     def has_add_permission(self, request):
         # Only allow one pricing object.
         if Pricing.objects.exists():
             return False
         return super().has_add_permission(request)
+
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -77,11 +79,14 @@ class PaymentAdmin(admin.ModelAdmin):
         field.name for field in Payment._meta.fields if field.name != 'response'
     ] + ['response_link']
 
+
     def has_add_permission(self, request):
         return False
 
+
     def has_delete_permission(self, request, obj=None):
         return False
+
 
     def response_link(self, obj):
         return mark_safe('<a href="{url}">{name}</a>'.format(

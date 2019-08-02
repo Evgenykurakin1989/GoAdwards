@@ -34,6 +34,7 @@ CAMPAIGNS_UNMANAGED = 'CAMPAIGNS_UNMANAGED'
 
 logger = logging.getLogger('adwords.adapter')
 
+
 def _require_linked_account(func):
     @wraps(func)
     def inner(self, *args, **kwargs):
@@ -141,6 +142,7 @@ class Adapter:
             'max': date_to.strftime('%Y%m%d'),
         }
 
+
     def get_conversion_trackers(self):
         adwords_service = self.get_adwords_service('ConversionTrackerService')
         selector = {
@@ -155,15 +157,18 @@ class Adapter:
 
         return self._cached_values['conversion_trackers']
 
+
     def get_adwords_service(self, service_name):
         adwords_client = self.get_adwords_client()
 
         return adwords_client.GetService(service_name, version=self.adwords_api_version)
 
+
     def get_report_downloader(self):
         report_downloader = self.get_adwords_client()
 
         return report_downloader.GetReportDownloader(version=self.adwords_api_version)
+
 
     def get_report(
             self,
@@ -195,6 +200,7 @@ class Adapter:
             next(report)
 
         return (row for row in report if row)
+
 
     @classmethod
     def get_customers(cls, refresh_token):
@@ -243,6 +249,7 @@ class Adapter:
 
         return managed_customers
 
+
     def get_customer(refresh_token):
         # Will be called outside of a view with no reasonable access to
         # a `User` instance.  Provide a `refresh_token` manually.       
@@ -270,6 +277,7 @@ class Adapter:
         print("%s : : %s" %(self._user.refresh_token, self._user.client_customer_id))
         return get_adwords_client(self._user.refresh_token, self._user.client_customer_id)
 
+
     def _get_campaign_instance(self, campaign):
         campaign = campaign.copy()
         adwords_campaign_id = campaign.pop('id')
@@ -285,6 +293,7 @@ class Adapter:
             setattr(instance, key, value)
 
         return instance
+
 
     def _inject_campaign_predicates(self, selector, campaigns_to_get):
         """
@@ -325,6 +334,7 @@ class Adapter:
 
         return True
 
+
     @_require_linked_account
     def get_budgets(self, budgets_to_get_ids=BUDGETS_ALL, date_range=ALL_TIME):
         budget_selector = {
@@ -356,6 +366,7 @@ class Adapter:
             for id_, amount, name in report
         )
 
+
     @_require_linked_account
     def get_spend_for_period(self, date_from, date_to):
         """
@@ -376,6 +387,7 @@ class Adapter:
         )
         return int(spend)
 
+
     @_require_linked_account
     def get_monthly_spend(self):
         date_to = datetime.datetime.now()
@@ -386,6 +398,7 @@ class Adapter:
             print("Error Occured!")
             spend = 0
         return spend
+
 
     @_require_linked_account
     def get_campaigns(self, campaigns_to_get=CAMPAIGNS_ALL, date_range=ALL_TIME, get_budgets=True):
@@ -458,6 +471,7 @@ class Adapter:
 
         return campaigns
 
+
     def get_mapped_campaigns(self, filter_by=None):
         campaigns_to_show = CAMPAIGNS_ALL
         if isinstance(filter_by, str):
@@ -475,6 +489,7 @@ class Adapter:
             in data
         ]
 
+
     @staticmethod
     def get_metrics_shape(metrics):
         if hasattr(metrics, 'values') and callable(metrics.values):
@@ -486,6 +501,7 @@ class Adapter:
         keys = metrics[0].keys()
 
         return {key: 0 for key in keys}
+
 
     @classmethod
     def _aggregate_metrics(cls, metrics, average_columns=()):
@@ -500,6 +516,7 @@ class Adapter:
                 initial[key] += value
 
         return initial
+
 
     @classmethod
     def aggregate_metrics_to_monthly(cls, metrics, date_format=datetime.date, average_columns=()):
@@ -527,6 +544,7 @@ class Adapter:
                 for month, metrics in categorised.items()
             }
 
+
     @classmethod
     def aggregate_campaign_metrics_to_monthly(cls, metrics, date_format=datetime.date):
         return cls.aggregate_metrics_to_monthly(
@@ -534,6 +552,7 @@ class Adapter:
             date_format=date_format,
             average_columns=('cpc', ),
         )
+
 
     def get_campaign_metrics(
             self,
@@ -573,6 +592,7 @@ class Adapter:
                 by_date[date]['cpc'] = by_date[date]['cost'] / by_date[date]['conversions']
 
         return by_date
+
 
     def get_keywords(
             self,
@@ -666,12 +686,14 @@ class Adapter:
             ) in report
         )
 
+
     def get_keywords_for_campaign(
             self,
             adwords_campaign_id,
             enabled_only=False,
             date_range=ALL_TIME):
         return self.get_keywords({'BaseCampaignId': adwords_campaign_id}, enabled_only, date_range)
+
 
     def get_mapped_keywords(self, campaign):
         data = self.get_keywords_for_campaign(campaign.adwords_campaign_id)
@@ -720,6 +742,8 @@ class Adapter:
 
         return keywords
 
+
+
     def get_adgroups_for_campaign(self, adwords_campaign_id):
         filters = {'BaseCampaignId': adwords_campaign_id, 'AdGroupStatus': 'ENABLED'}
         adgroups_selector = {
@@ -744,6 +768,7 @@ class Adapter:
                 id_,
             ) in report
         )
+
 
     def set_keyword_max_cpc(self, ad_group_id, keyword_id, max_cpc):
         ad_group_criterion_service = self.get_adwords_service('AdGroupCriterionService')
@@ -771,6 +796,7 @@ class Adapter:
         if self.should_mutate:
             return ad_group_criterion_service.mutate(operations)
 
+
     def set_keyword_paused(self, ad_group_id, keyword_id):
         ad_group_criterion_service = self.get_adwords_service('AdGroupCriterionService')
         operations = [{
@@ -787,6 +813,7 @@ class Adapter:
 
         if self.should_mutate:
             return ad_group_criterion_service.mutate(operations)
+
 
     def set_ad_groups_paused(self, ad_group_ids):
         ad_group_service = self.get_adwords_service('AdGroupService')
