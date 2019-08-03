@@ -7,6 +7,7 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+
     fieldsets = (
         (None, {'fields': ('email', 'password', )}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', )}),
@@ -22,6 +23,7 @@ class UserAdmin(BaseUserAdmin):
         )}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined', )}),
     )
+
     add_fieldsets = (
         (None, {
             'classes': ('wide', ),
@@ -34,6 +36,7 @@ class UserAdmin(BaseUserAdmin):
             ),
         }),
     )
+
     list_display = ('email', 'first_name', 'last_name', 'is_staff', )
     readonly_fields = ('google_analytics_client_id', )
     search_fields = ('first_name', 'last_name', 'email', 'google_analytics_client_id', )

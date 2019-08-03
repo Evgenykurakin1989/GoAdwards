@@ -58,6 +58,7 @@ class UserCreationForm(DjangoUserCreationForm):
 
 
 class EditUserForm(forms.ModelForm):
+
     new_password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput,
@@ -82,6 +83,7 @@ class EditUserForm(forms.ModelForm):
 
 
 class AdwordsClientCustomerForm(forms.Form):
+
     client_customer = forms.ChoiceField(choices=())
 
     def __init__(self, refresh_token=None, *args, **kwargs):
